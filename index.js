@@ -89,3 +89,18 @@ class Loop {
         }
     }
 }
+
+class TriangleLine {
+
+    constructor() {
+        this.state = new State()
+    }
+
+    draw(context) {
+        DrawingUtil.drawTriangularLine(context, this.state.scale)
+    }
+
+    update(cb) {
+        this.state.update(cb)
+    }
+}
