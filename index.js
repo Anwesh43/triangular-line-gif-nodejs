@@ -1,4 +1,22 @@
 const scGap = 0.02 
+const w = window.innerWidth
+const h = window.innerHeight 
+
+class ScaleUtil {
+
+    static maxScale(scale, i, n) {
+        return Math.max(0, scale - i / n)
+    }
+
+    static divideScale(scale, i, n) {
+        return Math.min(1 / n, ScaleUtil.maxScale(scale, i, n)) * n 
+    }
+
+    static sinify(scale) {
+        return Math.sin(scale * Math.PI / 180)
+    }
+}
+
 
 class State {
 
