@@ -130,7 +130,7 @@ class Renderer {
         this.gifEncoder.setRepeat(0)
     }
 
-    create(fileName) {
+    create(fileName, stop) {
         this.gifEncoder.createReadStream().pipe(createWriteStream(fileName))
         this.loop.start(() => {
             this.tl.draw(this.context, (context) => {
@@ -138,7 +138,34 @@ class Renderer {
             })
             this.tl.update(() => {
                 this.loop.stop()
+                stop()
             })
         })
+    }
+}
+
+class TerminalLoader {
+
+    constructor() {
+        this.started = false 
+    }
+
+    start(text) {
+        let i = 0 
+        const parts = ['.', '..', '...']
+        if (!this.started) {
+            this.started = true 
+            this.interval = setInterval(() => {
+                process.stdout.write(`${text}${parts[i % parts.length]}`)
+                i++
+            }, 40)
+        }
+    }
+    
+    stop() {
+        if (this.started) {
+            this.started = false 
+            clearInterval(this.interval)
+        }
     }
 }
