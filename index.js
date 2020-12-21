@@ -2,6 +2,9 @@ const scGap = 0.02
 const w = window.innerWidth
 const h = window.innerHeight 
 const sizeFactor = 5.6 
+const Canvas = require('canvas')
+const GifEncoder = require('gifencoder')
+const {createWriteStream} = require('fs')
 
 class ScaleUtil {
 
@@ -79,13 +82,14 @@ class Loop {
     start(cb) {
         if (!this.animated) {
             this.animated = true 
-            cb()
+            this.interval = setInterval(cb, 0)
         }
     }
 
-    stop(cb) {
+    stop() {
         if (this.animated) {
             this.animated = false 
+            clearInterval(this.interval)
         }
     }
 }
@@ -96,11 +100,45 @@ class TriangleLine {
         this.state = new State()
     }
 
-    draw(context) {
+    draw(context, cb) {
         DrawingUtil.drawTriangularLine(context, this.state.scale)
+        cb(context)
     }
 
-    update(cb) {
-        this.state.update(cb)
+    update(endcb) {
+        this.state.update(endcb)
+    }
+}
+
+
+class Renderer {
+
+    constructor() {
+        this.loop = new Loop()
+        this.canvas = new Canvas()
+        this.gifEncoder = new GifEncoder(w, h)
+        this.tl = new TriangleLine()
+        this.initRendererAndCanvas() 
+    }
+
+    initRendererAndCanvas() {
+        this.canvas.width = w 
+        this.canvas.height = h 
+        this.context = this.canvas.getContext('2d')
+        this.gifEncoder.setQuality(100)
+        this.gifEncoder.setDelay(20)
+        this.gifEncoder.setRepeat(0)
+    }
+
+    create(fileName) {
+        this.gifEncoder.createReadStream().pipe(createWriteStream(fileName))
+        this.loop.start(() => {
+            this.tl.draw(this.context, (context) => {
+                this.gifEncoder.addFrame(context)
+            })
+            this.tl.update(() => {
+                this.loop.stop()
+            })
+        })
     }
 }
