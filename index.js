@@ -14,3 +14,23 @@ class State {
         }  
     }
 }
+
+class Loop {
+
+    constructor() {
+        this.animated = false 
+    }
+
+    start(cb) {
+        if (!this.animated) {
+            this.animated = true 
+            cb()
+        }
+    }
+
+    stop(cb) {
+        if (this.animated) {
+            this.animated = false 
+        }
+    }
+}
