@@ -169,3 +169,10 @@ class TerminalLoader {
         }
     }
 }
+
+const renderer = new Renderer()
+const terminalLoader = new TerminalLoader()
+terminalLoader.start()
+renderer.create('test.gif', () => {
+    terminalLoader.stop()
+})
